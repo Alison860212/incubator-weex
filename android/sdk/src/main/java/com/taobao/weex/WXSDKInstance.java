@@ -772,7 +772,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   @Override
   public boolean onActivityBack() {
 
-    WXModuleManager.onActivityBack(getInstanceId());
+    if(WXModuleManager.onActivityBack(getInstanceId())) {
+      return true;
+    }
 
     if(mRootComp != null) {
       return mRootComp.onActivityBack();

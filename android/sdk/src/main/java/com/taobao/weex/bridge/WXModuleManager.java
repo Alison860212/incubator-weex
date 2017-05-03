@@ -279,7 +279,9 @@ public class WXModuleManager {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
         if (module != null) {
-          return module.onActivityBack();
+          if(module.onActivityBack()) {
+            return true;
+          }
         } else {
           WXLogUtils.w("onActivityCreate can not find the " + key + " module");
         }

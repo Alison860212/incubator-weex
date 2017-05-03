@@ -1179,7 +1179,30 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                    + ", exception function:" + function + ", exception:"
                    + exception);
     }
-    WXSDKInstance instance;
+    WXSDKInstance instance = null;
+    if(instanceId != null) {
+      instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+
+      if(instance != null) {
+        instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
+
+        String err = "function:" + function + "#exception:" + exception;
+        commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
+      }
+    }
+
+    IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
+    if (adapter != null) {
+      String bundleUrl = (instance != null ? instance.getBundleUrl() : null);
+
+      WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, bundleUrl, WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception, null);
+      adapter.onJSException(jsException);
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d(jsException.toString());
+      }
+    }
+
+    /*WXSDKInstance instance;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
 
@@ -1194,7 +1217,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           WXLogUtils.d(jsException.toString());
         }
       }
-    }
+    }*/
   }
 
   public static class TimerInfo {
